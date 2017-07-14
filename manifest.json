@@ -1,0 +1,7 @@
+{
+  "name": "PomonoPolymerFrontend",
+  "short_name": "PomonoPolymerFrontend",
+  "description": "Polymer Frontend, Node Backen, Mongo Database",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "PomonoPolymerFrontend",
+  "description": "Polymer Frontend, Node Backen, Mongo Database",
+  "main": "index.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.7",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.10",
+    "app-elements": "PolymerElements/app-elements#^1.0.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
+  }
+}

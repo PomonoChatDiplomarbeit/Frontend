@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../paper-progress/paper-progress.html">
+
+<link rel="import" href="..">
+<dom-module id="main-page">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <app-header reveals>
+      <app-toolbar>
+        <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
+        <div main-title>Pomono</div>
+        <paper-icon-button icon="delete"></paper-icon-button>
+        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-button icon="close"></paper-icon-button>
+        <paper-progress value="10" indeterminate bottom-item></paper-progress>
+      </app-toolbar>
+    </app-header>
+    <app-drawer id="drawer" swipe-open></app-drawer>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class MainPage extends Polymer.Element {
+      static get is() { return 'main-page'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'main-page'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(MainPage.is, MainPage);
+  </script>
+</dom-module>
