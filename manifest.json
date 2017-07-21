@@ -1,7 +1,7 @@
 {
-  "name": "PomonoPolymerFrontend",
-  "short_name": "PomonoPolymerFrontend",
-  "description": "Polymer Frontend, Node Backen, Mongo Database",
+  "name": "Pomono Frontend",
+  "short_name": "Pomono Frontend",
+  "description": "Chat based on Polymer, Node, MongoDB",
   "start_url": "/",
   "display": "standalone"
 }

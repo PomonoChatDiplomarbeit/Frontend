@@ -72,7 +72,7 @@
     "commit": "63b5453e260d4fbe19513d02ca8a34a0555394dd"
   },
   "_source": "https://github.com/PolymerElements/app-layout.git",
-  "_target": "^2.0.1",
+  "_target": "2.0",
   "_originalSource": "PolymerElements/app-layout",
   "_direct": true
 }

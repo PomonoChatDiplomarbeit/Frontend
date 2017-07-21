@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<dom-module id="pomono-message">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-item class="custommessage">
+      <paper-item-body two-line>
+          <div>{{contact}}</div>
+          <div secondary>{{messagetext}}</div>
+      </paper-item-body>
+    </paper-item>
+  </template>
+
+  <script>
+    /**
+     * `pomono-message`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PomonoMessage extends Polymer.Element {
+      static get is() { return 'pomono-message'; }
+      static get properties() {
+        return {
+          contact: {
+            type: String,
+            value: undefined
+          },
+          messagetext: {
+            type: String,
+            value: undefined
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PomonoMessage.is, PomonoMessage);
+  </script>
+</dom-module>

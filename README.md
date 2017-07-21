@@ -1,6 +1,6 @@
-# \<PomonoPolymerFrontend\>
+# \<Pomono Frontend\>
 
-Polymer Frontend, Node Backen, Mongo Database
+Chat based on Polymer, Node, MongoDB
 
 ## Install the Polymer-CLI
 

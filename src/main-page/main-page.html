@@ -1,30 +1,112 @@
+<script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../paper-progress/paper-progress.html">
-
-<link rel="import" href="..">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="./pomono-message.html">
+<link rel="import" href="./pomono-login-popup.html">
 <dom-module id="main-page">
   <template>
-    <style>
-      :host {
-        display: block;
-      }
+    <style is="custom-style"> 
+        :host {
+          display: block;
+          padding: 10px;
+        }
+        paper-button {
+          font-family: 'Roboto', 'Noto', sans-serif;
+          font-weight: normal;
+          font-size: 14px;
+          -webkit-font-smoothing: antialiased;
+        }
+        paper-button.indigo {
+          background-color: var(--paper-indigo-500);
+          color: white;
+          --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-pink-a200) !important;
+            color: white !important;
+          };
+        }
+        html, body {
+        margin: 0;
+          font-family: 'Roboto', 'Noto', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          background-color: #FFCCBC;
+          max-height: 368px;
+        }
+        app-toolbar {
+          background-color: #E64A19;
+          color: #fff;
+        }
+
+        paper-icon-button {
+          --paper-icon-button-ink-color: white;
+        }
+
+        paper-icon-button + [main-title] {
+          margin-left: 24px;
+        }
+        app-header {
+          @apply --layout-fixed-top;
+          color: #fff;
+          --app-header-background-rear-layer: {
+            background-color: #ef6c00;
+          };
+        }
+        app-drawer {
+          --app-drawer-scrim-background: rgba(0, 0, 100, 0.8);
+          --app-drawer-content-container: {
+            background-color: #00BCD4;
+          }
+        }
+        #centerPanel {
+          min-height: 100vh;
+        }
+        .custommessage {
+          background-color: #BDBDBD;
+        }
     </style>
-    <app-header reveals>
-      <app-toolbar>
-        <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
-        <div main-title>Pomono</div>
-        <paper-icon-button icon="delete"></paper-icon-button>
-        <paper-icon-button icon="search"></paper-icon-button>
-        <paper-icon-button icon="close"></paper-icon-button>
-        <paper-progress value="10" indeterminate bottom-item></paper-progress>
-      </app-toolbar>
-    </app-header>
-    <app-drawer id="drawer" swipe-open></app-drawer>
+<!-- include="shared-styles" -->
+   <app-drawer-layout>
+     <app-drawer id="drawer" swipe-open slot="drawer">
+        <paper-menu selected="0">
+          <template is="dom-repeat" items="{{availableChatPartners}}">
+              <paper-item>{{item}}</paper-item>
+          </template>
+      </paper-menu>
+      </app-drawer>
+      <app-header-layout>
+        <app-header slot="header">
+          <app-toolbar>
+            <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
+            <div main-title>{{chatPartner}}</div>
+            <paper-icon-button icon="search"></paper-icon-button>
+          </app-toolbar>
+        </app-header>
+        <div id="centerPanel">
+          <pomono-login-popup></pomono-login-popup>
+            <div class="my-content-wrapper">
+              <div id="listOfMessages" role="listbox">
+                <template is="dom-repeat" items="{{allmessages}}">
+                  <pomono-message contact="{{item.sender}}" messagetext="{{item.text}}" ></pomono-message>
+                </template>
+              </div>
+            </div>
+            <div id="submissionBlock">
+              <paper-input id="message" label="Message" value="{{message}}">
+                <iron-icon icon="mail" slot="prefix"></iron-icon>
+                <paper-icon-button id="sendMessage" slot="suffix" icon="send"></paper-icon-button>
+              </paper-input>
+            </div>
+        </div>
+      </app-header-layout>
+    </app-drawer-layout>
   </template>
 
   <script>
@@ -32,16 +114,58 @@
      * @customElement
      * @polymer
      */
+     class MessageObj{
+        constructor(text, sender, receiver) {
+            this.text = text;
+            this.sender = sender;
+            this.receiver = receiver;
+        }
+    }
     class MainPage extends Polymer.Element {
       static get is() { return 'main-page'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'main-page'
+       ready() {
+            super.ready();
+            this.$.sendMessage.addEventListener('click', e => {this._handleClick(e)});
+        }
+
+        _handleClick(e) {
+          if(this.message!=undefined&&this.message!=""){
+            this.push('allmessages', new MessageObj(this.message, "Fabian", this.chatPartner));
+            console.info('Message:' + this.message);
           }
-        };
-      }
+        }
+
+        static get properties() {
+            return {
+                greeting: {
+                    type: String,
+                    value: "Hello!"
+                },
+                message: {
+                    type: String,
+                    value: ""
+                },
+                allmessages: {
+                    type: Array,
+                    value: [
+                        new MessageObj("Nachricht 1", "Dragan", "Fabian"),
+                        new MessageObj("Nachricht 2", "Dragan", "Fabian")
+                    ]
+                },
+                chatPartner: {
+                    type: String,
+                    value: "Dragan"
+                },
+                availableChatPartners: {
+                    type: String,
+                    value: [
+                        "Dragan",
+                        "Sandro",
+                        "Düas"
+                    ]
+                }
+            }
+        }
     }
 
     window.customElements.define(MainPage.is, MainPage);
