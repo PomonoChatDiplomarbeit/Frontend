@@ -1,5 +1,5 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-<script src="./serverCommunication.js/Communicator"></script>
+<!--<script src="./serverCommunication.js/"></script>-->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -93,7 +93,7 @@
           </app-toolbar>
         </app-header>
         <div id="centerPanel">
-          <pomono-login-popup></pomono-login-popup>
+          <!--<pomono-login-popup></pomono-login-popup>-->
             <div class="my-content-wrapper">
               <div id="listOfMessages" role="listbox">
                 <template is="dom-repeat" items="{{allmessages}}">
@@ -117,6 +117,15 @@
      * @customElement
      * @polymer
      */
+    //todo: alle Klassen auslagern
+      class Communicator {
+        static getMessagesForChat(chatPartnerName) {
+            console.log('partner: ' + chatPartnerName);
+        }
+        static anotherStaticMethod() {
+            return this.staticMethod() + ' from another static method';
+        }
+      }
      class MessageObj{
         constructor(text, sender, receiver) {
             this.text = text;
@@ -167,11 +176,15 @@
                         "Sandro",
                         "Düas"
                     ]
+                },
+                communicator : {
+                  type: Object,
+                  value: new Communicator()
                 }
             }
         }
         _chatPartnerChanged(){
-          Communicator.getMessagesForChat
+           allmessages = communicator.getMessagesForChat(chatPartner);
         }
         _toggleDrawer() {
             document.querySelector('#drawer').toggle();
