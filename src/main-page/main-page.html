@@ -1,4 +1,5 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+<script src="./serverCommunication.js/Communicator"></script>
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -9,9 +10,11 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="./pomono-message.html">
 <link rel="import" href="./pomono-login-popup.html">
+
 <dom-module id="main-page">
   <template>
     <style is="custom-style"> 
@@ -75,16 +78,16 @@
 <!-- include="shared-styles" -->
    <app-drawer-layout>
      <app-drawer id="drawer" swipe-open slot="drawer">
-        <paper-menu selected="0">
+        <paper-listbox selected="0">
           <template is="dom-repeat" items="{{availableChatPartners}}">
               <paper-item>{{item}}</paper-item>
           </template>
-      </paper-menu>
+        </paper-listbox>
       </app-drawer>
       <app-header-layout>
         <app-header slot="header">
           <app-toolbar>
-            <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
+            <paper-icon-button icon="menu" onclick="toggleDrawer()"></paper-icon-button>
             <div main-title>{{chatPartner}}</div>
             <paper-icon-button icon="search"></paper-icon-button>
           </app-toolbar>
@@ -134,7 +137,7 @@
             console.info('Message:' + this.message);
           }
         }
-
+        
         static get properties() {
             return {
                 greeting: {
@@ -154,7 +157,8 @@
                 },
                 chatPartner: {
                     type: String,
-                    value: "Dragan"
+                    value: "Dragan",
+                    observer: '_chatPartnerChanged'
                 },
                 availableChatPartners: {
                     type: String,
@@ -165,6 +169,12 @@
                     ]
                 }
             }
+        }
+        _chatPartnerChanged(){
+          Communicator.getMessagesForChat
+        }
+        _toggleDrawer() {
+            document.querySelector('#drawer').toggle();
         }
     }
 

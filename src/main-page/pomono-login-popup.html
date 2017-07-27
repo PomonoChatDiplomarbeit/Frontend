@@ -33,7 +33,10 @@
       static get is() { return 'pomono-login-popup'; }
       constructor (){
         super();
-        //this.$.dialog.open();
+      }
+      connectedCallback() {
+        // Called every time the element is inserted into the DOM
+        document.querySelector("#dialog").opened = true;
       }
       static get properties() {
         return {
