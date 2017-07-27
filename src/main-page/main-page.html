@@ -78,7 +78,7 @@
 <!-- include="shared-styles" -->
    <app-drawer-layout>
      <app-drawer id="drawer" swipe-open slot="drawer">
-        <paper-listbox selected="0">
+        <paper-listbox selected="{{selectedDrawer}}" attr-for-selected="name">
           <template is="dom-repeat" items="{{availableChatPartners}}">
               <paper-item>{{item}}</paper-item>
           </template>
@@ -119,10 +119,16 @@
      */
     //todo: alle Klassen auslagern
       class Communicator {
-        static getMessagesForChat(chatPartnerName) {
+        //todo: make static
+        getMessagesForChat(chatPartnerName) {
             console.log('partner: ' + chatPartnerName);
+            return  [
+                        new MessageObj("Nachricht 1", "Dragan", "Fabian"),
+                        new MessageObj("Nachricht 2", "Dragan", "Fabian")
+                    ];
         }
-        static anotherStaticMethod() {
+        //todo: make static
+        anotherStaticMethod() {
             return this.staticMethod() + ' from another static method';
         }
       }
@@ -159,11 +165,9 @@
                 },
                 allmessages: {
                     type: Array,
-                    value: [
-                        new MessageObj("Nachricht 1", "Dragan", "Fabian"),
-                        new MessageObj("Nachricht 2", "Dragan", "Fabian")
-                    ]
+                    value: []
                 },
+                selectedDrawer: 'Dragan',
                 chatPartner: {
                     type: String,
                     value: "Dragan",
@@ -184,7 +188,7 @@
             }
         }
         _chatPartnerChanged(){
-           allmessages = communicator.getMessagesForChat(chatPartner);
+           this.allmessages = this.communicator.getMessagesForChat(this.chatPartner);
         }
         _toggleDrawer() {
             document.querySelector('#drawer').toggle();
