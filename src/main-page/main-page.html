@@ -97,7 +97,7 @@
       <app-header-layout>
         <app-header slot="header">
           <app-toolbar>
-            <paper-icon-button icon="menu" onclick="toggleDrawer()"></paper-icon-button>
+            <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
             <!--<div main-title>{{chatPartner}}</div>-->
             <div main-title>{{chatPartner}}</div>
             <paper-icon-button icon="search"></paper-icon-button>
@@ -162,6 +162,7 @@
        ready() {
             super.ready();
             this.$.sendMessage.addEventListener('click', e => {this._handleClick(e)});
+            this.$.menutoggle.addEventListener('click',  e => {this._toggleDrawer(e)});
             this._loadAllChatPartners();
         }
 
@@ -175,10 +176,12 @@
           console.log('Messages loaded for ' + this.chatPartner);
            this.allmessages = this.communicator.getMessagesForChat(this.chatPartner);
         }
-        _toggleDrawer() {
-            document.querySelector('#drawer').toggle();
+        _toggleDrawer(e) {
+            console.log("Drawer toggled!");
+            this.$.drawer.toggle();
         }
         _computeSelectedItem(selectedID) { 
+          this._toggleDrawer();
           return this.availableChatPartners[selectedID];
         }
         _loadAllChatPartners(){
