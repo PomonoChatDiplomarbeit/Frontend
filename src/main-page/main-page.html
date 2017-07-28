@@ -69,28 +69,21 @@
           }
         }
         #centerPanel {
-          min-height: 100vh;
+          min-height: 100%;
         }
-        .custommessage {
-          background-color: #BDBDBD;
+        .chatPartnerDrawer {
+          background-color: lightseagreen;
         }
     </style>
 <!-- include="shared-styles" -->
-  <!--<paper-dialog>
-    <h2>Header</h2>
-    <paper-dialog-scrollable>
-      Lorem ipsum...
-    </paper-dialog-scrollable>
-    <div class="buttons">
-      <paper-button dialog-dismiss>Cancel</paper-button>
-      <paper-button dialog-confirm autofocus>Accept</paper-button>
-    </div>
-  </paper-dialog>-->
+   <pomono-login-popup id="popup"></pomono-login-popup>
    <app-drawer-layout>
      <app-drawer id="drawer" swipe-open slot="drawer">
+       <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
         <paper-listbox id="allChats" selected="{{selectedID}}" fallback-selection="0">
           <template is="dom-repeat" items="{{availableChatPartners}}">
-              <paper-item>{{item}}</paper-item>
+              <paper-item class="chatPartnerDrawer"><paper-button>{{item}}</paper-button></paper-item>
+              <!--<paper-button>{{item}}</paper-button>-->
           </template>
         </paper-listbox>
       </app-drawer>
@@ -98,13 +91,11 @@
         <app-header slot="header">
           <app-toolbar>
             <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
-            <!--<div main-title>{{chatPartner}}</div>-->
             <div main-title>{{chatPartner}}</div>
             <paper-icon-button icon="search"></paper-icon-button>
           </app-toolbar>
         </app-header>
         <div id="centerPanel">
-          <!--<pomono-login-popup></pomono-login-popup>-->
             <div class="my-content-wrapper">
               <div id="listOfMessages" role="listbox">
                 <template is="dom-repeat" items="{{allmessages}}">
@@ -130,7 +121,6 @@
      */
     //todo: alle Klassen auslagern
       class Communicator {
-        //todo: make static
         getMessagesForChat(chatPartnerName) {
             console.log('partner: ' + chatPartnerName);
             return  [
@@ -138,7 +128,7 @@
                         new MessageObj("Nachricht 2", chatPartnerName, "Fabian")
                     ];
         }
-        //todo: make static
+       
         anotherStaticMethod() {
             return this.staticMethod() + ' from another static method';
         }
@@ -163,9 +153,15 @@
             super.ready();
             this.$.sendMessage.addEventListener('click', e => {this._handleClick(e)});
             this.$.menutoggle.addEventListener('click',  e => {this._toggleDrawer(e)});
+            this.$.openlogin.addEventListener('click',  e => {this._openLogin(e)});
+            //this.$.dialog.open();
+
+            this._openLogin();
             this._loadAllChatPartners();
         }
-
+        _openLogin(e) {
+          this.$.popup.opened = true;
+        }
         _handleClick(e) {
           if(this.message!=undefined&&this.message!=""){
             this.push('allmessages', new MessageObj(this.message, "Fabian", this.chatPartner));
@@ -181,6 +177,7 @@
             this.$.drawer.toggle();
         }
         _computeSelectedItem(selectedID) { 
+          this.message = "";
           this._toggleDrawer();
           return this.availableChatPartners[selectedID];
         }
