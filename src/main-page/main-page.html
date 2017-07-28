@@ -76,9 +76,19 @@
         }
     </style>
 <!-- include="shared-styles" -->
+  <!--<paper-dialog>
+    <h2>Header</h2>
+    <paper-dialog-scrollable>
+      Lorem ipsum...
+    </paper-dialog-scrollable>
+    <div class="buttons">
+      <paper-button dialog-dismiss>Cancel</paper-button>
+      <paper-button dialog-confirm autofocus>Accept</paper-button>
+    </div>
+  </paper-dialog>-->
    <app-drawer-layout>
      <app-drawer id="drawer" swipe-open slot="drawer">
-        <paper-listbox selected="{{selectedDrawer}}" attr-for-selected="name">
+        <paper-listbox id="allChats" selected="{{selectedID}}" fallback-selection="0">
           <template is="dom-repeat" items="{{availableChatPartners}}">
               <paper-item>{{item}}</paper-item>
           </template>
@@ -88,6 +98,7 @@
         <app-header slot="header">
           <app-toolbar>
             <paper-icon-button icon="menu" onclick="toggleDrawer()"></paper-icon-button>
+            <!--<div main-title>{{chatPartner}}</div>-->
             <div main-title>{{chatPartner}}</div>
             <paper-icon-button icon="search"></paper-icon-button>
           </app-toolbar>
@@ -123,13 +134,20 @@
         getMessagesForChat(chatPartnerName) {
             console.log('partner: ' + chatPartnerName);
             return  [
-                        new MessageObj("Nachricht 1", "Dragan", "Fabian"),
-                        new MessageObj("Nachricht 2", "Dragan", "Fabian")
+                        new MessageObj("Nachricht 1", chatPartnerName, "Fabian"),
+                        new MessageObj("Nachricht 2", chatPartnerName, "Fabian")
                     ];
         }
         //todo: make static
         anotherStaticMethod() {
             return this.staticMethod() + ' from another static method';
+        }
+        getAllChatPartners() {
+          return [
+              "Dragan",
+              "Sandro",
+              "Tschofe"
+          ];
         }
       }
      class MessageObj{
@@ -144,6 +162,7 @@
        ready() {
             super.ready();
             this.$.sendMessage.addEventListener('click', e => {this._handleClick(e)});
+            this._loadAllChatPartners();
         }
 
         _handleClick(e) {
@@ -152,46 +171,47 @@
             console.info('Message:' + this.message);
           }
         }
-        
+        _chatPartnerChanged(){
+          console.log('Messages loaded for ' + this.chatPartner);
+           this.allmessages = this.communicator.getMessagesForChat(this.chatPartner);
+        }
+        _toggleDrawer() {
+            document.querySelector('#drawer').toggle();
+        }
+        _computeSelectedItem(selectedID) { 
+          return this.availableChatPartners[selectedID];
+        }
+        _loadAllChatPartners(){
+            this.availableChatPartners = this.communicator.getAllChatPartners();
+        }
         static get properties() {
             return {
-                greeting: {
+                greeting : {
                     type: String,
                     value: "Hello!"
                 },
-                message: {
+                message : {
                     type: String,
                     value: ""
                 },
-                allmessages: {
+                allmessages : {
                     type: Array,
                     value: []
                 },
-                selectedDrawer: 'Dragan',
-                chatPartner: {
+                chatPartner : {
                     type: String,
-                    value: "Dragan",
+                    computed: '_computeSelectedItem(selectedID)',
                     observer: '_chatPartnerChanged'
                 },
-                availableChatPartners: {
-                    type: String,
-                    value: [
-                        "Dragan",
-                        "Sandro",
-                        "Düas"
-                    ]
+                availableChatPartners : {
+                    type: Array,
+                    value: []
                 },
                 communicator : {
                   type: Object,
                   value: new Communicator()
                 }
             }
-        }
-        _chatPartnerChanged(){
-           this.allmessages = this.communicator.getMessagesForChat(this.chatPartner);
-        }
-        _toggleDrawer() {
-            document.querySelector('#drawer').toggle();
         }
     }
 
