@@ -1,7 +1,11 @@
+
 class Communicator {
     constructor(){
         this.map=[]
         this.map=this.loadTestData()
+    }
+    connectToServer(){
+        this.socket=io.connect('http://127.0.0.1:4200/');
     }
     loadTestData(){
         var temp = [];
