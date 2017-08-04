@@ -1,0 +1,101 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<dom-module id="socket-communicator">
+    <template>
+    </template>
+
+    <script>
+        /**
+     * `socket-communicator`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+
+        class SocketCommunicator extends Polymer.Element {
+            static get is() { return 'socket-communicator'; }
+            constructor() {
+                super();
+                this.connectToSocketIO();
+            }
+            connectedCallback() {
+                this.connectToSocketIO();
+            }
+            connectToSocketIO() {
+                if (!this.loggedin) {
+                    this.socket = io.connect('http://127.0.0.1:8080/');
+                    this.socket.on('loginResponse', data => { this.IOLoginResponse(data) });
+                    this.socket.on('cPResponse', data => { this.IOcPresponse(allChatPartners) });
+                    this.socket.on('messagesResponse', data => { this.IOmessagesResponse(listOfMessages) });
+                    this.socket.on('messageResponse', data => { this.IOmessageResponse(data.message, data.status) });
+                }
+            }
+
+            login() {
+                if (!this.loggedin) {
+                    this.loggedin = true;
+                    this.socket.emit('login', this.username);
+                    console.log('logged in via socket io');
+                }
+            }
+            getAllChatPartners() {
+                this.socket.emit('getallChatPartners', this.username);
+                console.log('socket io getallChatPartners');
+            }
+            getAllMessagesForChat() {
+                this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatPartner });
+                console.log('socket io getMessagesForChat');
+            }
+            emitMessage() {
+                if (this.loggedin) {
+                    this.socket.emit('pushMessage', new MessageObject(this.message,this.username,this.chatPartner));
+                    console.log('message emited via socket io');
+                }
+            }
+            IOLoginResponse(status) {
+                console.log(status);
+            }
+            IOcPresponse(allChatPartners) {
+                console.log("Charpartners received count: " + allChatPartners.length);
+                console.log(allChatPartners);
+                this.availableChatPartners = allChatPartners;
+            }
+            IOmessagesResponse(listOfMessages) {
+                console.log('messages received for ' + this.chatPartner + ' count: ' + listOfMessages.length);
+                this.allmessages = listOfMessages;
+            }
+            IOmessageResponse(message, status) {
+                console.log('message: ' + message + ';server: ' + status);
+            }
+            static get properties() {
+                return {
+                    message: {
+                        type: String
+                    },
+                    allmessages: {
+                        type: Array
+                    },
+                    chatPartner: {
+                        type: String
+                    },
+                    availableChatPartners: {
+                        type: Array
+                    },
+                    username: {
+                        type: String
+                    },
+                    loggedin: {
+                        type: Boolean,
+                        value: false
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(SocketCommunicator.is, SocketCommunicator);
+    </script>
+</dom-module>

@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<dom-module id="chat-partner">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-item class="chatPartnerDrawer">
+        <paper-button>{{chatpartner}}</paper-button>
+    </paper-item>
+  </template>
+
+  <script>
+    /**
+     * `chat-partner`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class ChatPartner extends Polymer.Element {
+      static get is() { return 'chat-partner'; }
+      static get properties() {
+        return {
+          chatpartner: {
+              type: String
+          }
+        };
+      }
+    }
+
+    window.customElements.define(ChatPartner.is, ChatPartner);
+  </script>
+</dom-module>

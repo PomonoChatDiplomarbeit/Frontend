@@ -38,13 +38,15 @@
   <head>
       <meta name="google-signin-scope" content="profile email">
       <meta name="google-signin-client_id" content="AIzaSyB5GbcWeQ9mvSmGtvwLSxNtovqrrBihc7Q">
-  </head> 
+  </head>
+
     <paper-dialog id="dialog" class="size-position" opened="{{opened}}" modal>
       <h1 id="loginheader">Log in</h1>
-      <paper-progress indeterminate class="blue" id="progress"></paper-progress>
+      <paper-button id="testloginbutton">Login</paper-button> 
+      <!--<paper-progress indeterminate class="blue" id="progress"></paper-progress>
       <div>
           <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-      </div>
+      </div>-->
       <div class="buttons">
             <paper-button id="closebtn" dialog-confirm>
                 <iron-icon icon="close"></iron-icon>Close
@@ -62,7 +64,7 @@
      * @polymer
      * @demo demo/index.html
      */
-    function onSignIn(googleUser) {
+    /*function onSignIn(googleUser) {
         // Useful data for your client-side scripts:
         var profile = googleUser.getBasicProfile();
         console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -75,11 +77,17 @@
         // The ID token you need to pass to your backend:
         var id_token = googleUser.getAuthResponse().id_token;
         console.log("ID Token: " + id_token);
-    };
+    };*/
     class PonomoLoginPopup extends Polymer.Element {
       static get is() { return 'pomono-login-popup'; }
       constructor (){
         super();
+      }
+      ready() {
+       //this.$.testloginbutton.addEventListener('click', e => { this._login(e) });
+      }
+      _login() {
+        this.isclicked = true;
       }
       connectedCallback() {
         // Called every time the element is inserted into the DOM
@@ -87,9 +95,9 @@
       }
       static get properties() {
         return {
-          prop1: {
-            type: String,
-            value: 'pomono-login-popup'
+          isclicked: {
+            type: Boolean,
+            value: false
           }
         };
       }
