@@ -1,16 +1,23 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+
 <dom-module id="chat-partner">
   <template>
     <style>
       :host {
         display: block;
       }
+      .iron-image {
+        height: width;
+      }
     </style>
-    <paper-item class="chatPartnerDrawer">
+    <paper-icon-item class="chatPartnerDrawer">
+        <iron-image alt="chatpartner-Logo" src="[[picturename]]" slot="item-icon"></iron-image>
         <paper-button>{{chatpartner}}</paper-button>
-    </paper-item>
+    </paper-icon-item>
   </template>
 
   <script>
@@ -24,10 +31,17 @@
      */
     class ChatPartner extends Polymer.Element {
       static get is() { return 'chat-partner'; }
+      _computePicName(chatpartner) {
+          return '/src/chatPartnerIcons/' + chatpartner.substring(0,1).toUpperCase() + '.png'
+      }
       static get properties() {
         return {
           chatpartner: {
               type: String
+          },
+          picturename: {
+              type: String,
+              computed: '_computePicName(chatpartner)'
           }
         };
       }

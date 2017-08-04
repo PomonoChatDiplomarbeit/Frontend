@@ -18,6 +18,7 @@
 <link rel="import" href="./pomono-login-popup.html">
 <link rel="import" href="./socket-communicator.html">
 <link rel="import" href="./chat-partner.html">
+<link rel="import" href="./newchat-overlay.html">
 <dom-module id="main-page">
   <template>
     <style is="custom-style">
@@ -106,9 +107,11 @@
           availablechatpartners="{{availableChatPartners}}">
     </socket-communicator>
     <pomono-login-popup id="popup" isclicked="{{loginbuttonclicked}}"></pomono-login-popup>
+    <newchat-overlay id="newChatOverlay"></newchat-overlay>
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
         <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
+        <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
         <paper-listbox class="chatPartnerDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
           <template is="dom-repeat" items="{{availableChatPartners}}">
             <chat-partner chatpartner="{{item}}"></chat-partner>
@@ -158,8 +161,12 @@
         //this.$.sendMessage.addEventListener('on-key-pressed', e => { this._keypressed(e) });
         this.$.menutoggle.addEventListener('click', e => { this._toggleDrawer(e) });
         this.$.openlogin.addEventListener('click', e => { this._openLogin(e) });
+        this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) });
         //this._openLogin();
         this._loadAllChatPartners();
+      }
+      _openNewChatOverlay(e) {
+        console.log('overlay triggered!');
       }
       _keypressed(e) {
         console.log('key pressed');
@@ -236,7 +243,6 @@
         }
       }
     }
-
     window.customElements.define(MainPage.is, MainPage);
   </script>
 </dom-module>

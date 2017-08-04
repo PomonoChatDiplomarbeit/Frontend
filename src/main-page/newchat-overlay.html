@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<dom-module id="newchat-overlay">
+  <template>
+  </template>
+
+  <script>
+    /**
+     * `newchat-overlay`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class NewChatOverlay extends Polymer.Element {
+      static get is() { return 'newchat-overlay'; }
+      constructor (){
+        super();
+      }
+      ready() {
+       //this.$.testloginbutton.addEventListener('click', e => { this._login(e) });
+      }
+      _login() {
+        this.isclicked = true;
+      }
+      connectedCallback() {
+        // Called every time the element is inserted into the DOM
+        //this.$.dialog.open();
+      }
+      static get properties() {
+        return {
+          isclicked: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+    }
+
+    window.customElements.define(NewChatOverlay.is, NewChatOverlay);
+  </script>
+</dom-module>
