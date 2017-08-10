@@ -1,6 +1,5 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-<script src="/src/main-page/serverCommunication.js"></script>
 <script src="/src/main-page/messageObj.js"></script>
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
@@ -101,7 +100,7 @@
     <socket-communicator 
           id="communicator" 
           username="{{username}}" 
-          message="{{messsage}}" 
+          message="{{message}}" 
           allmessages="{{allmessages}}"
           chatpartner="{{chatPartner}}"
           availablechatpartners="{{availableChatPartners}}">
@@ -112,6 +111,7 @@
       <app-drawer id="drawer" swipe-open slot="drawer">
         <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
         <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
+        <paper-input value="{{username}}"></paper-input>
         <paper-listbox class="chatPartnerDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
           <template is="dom-repeat" items="{{availableChatPartners}}">
             <chat-partner chatpartner="{{item}}"></chat-partner>
@@ -179,7 +179,7 @@
       }
       _loginButtonClicked() {
         this.$.communicator.login();
-        this.$.communicator.getAllChatPartners();
+        this.$.communicator.getAllchatpartners();
         this.$.communicator.getAllMessagesForChat();
       }
       _emitNewMessage(e) {

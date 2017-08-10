@@ -29,9 +29,9 @@
                 if (!this.loggedin) {
                     this.socket = io.connect('http://127.0.0.1:8080/');
                     this.socket.on('loginResponse', data => { this.IOLoginResponse(data) });
-                    this.socket.on('cPResponse', data => { this.IOcPresponse(allChatPartners) });
+                    this.socket.on('cPResponse', data => { this.IOcPresponse(allchatpartners) });
                     this.socket.on('messagesResponse', data => { this.IOmessagesResponse(listOfMessages) });
-                    this.socket.on('messageResponse', data => { this.IOmessageResponse(data.message, data.status) });
+                    this.socket.on('messageResponse', data => { this.IOmessageResponse(data.textToDisplay, data.status) });
                 }
             }
 
@@ -42,34 +42,38 @@
                     console.log('logged in via socket io');
                 }
             }
-            getAllChatPartners() {
-                this.socket.emit('getallChatPartners', this.username);
-                console.log('socket io getallChatPartners');
+            getAllchatpartners() {
+                this.socket.emit('getallchatpartners', this.username);
+                console.log('socket io getallchatpartners');
             }
             getAllMessagesForChat() {
-                this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatPartner });
+                this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatpartner });
                 console.log('socket io getMessagesForChat');
             }
             emitMessage() {
                 if (this.loggedin) {
-                    this.socket.emit('pushMessage', new MessageObject(this.message,this.username,this.chatPartner));
-                    console.log('message emited via socket io');
+                    var toemit = new MessageObj(this.message,this.username,this.chatpartner)
+                    this.socket.emit('pushMessage', toemit);
+                    console.log(toemit);
                 }
             }
             IOLoginResponse(status) {
                 console.log(status);
             }
-            IOcPresponse(allChatPartners) {
-                console.log("Charpartners received count: " + allChatPartners.length);
-                console.log(allChatPartners);
-                this.availableChatPartners = allChatPartners;
+            IOcPresponse(allchatpartners) {
+                console.log("Charpartners received count: " + allchatpartners.length);
+                console.log(allchatpartners);
+                this.availablechatpartners = allchatpartners;
             }
             IOmessagesResponse(listOfMessages) {
-                console.log('messages received for ' + this.chatPartner + ' count: ' + listOfMessages.length);
+                console.log('messages received for ' + this.chatpartner + ' count: ' + listOfMessages.length);
                 this.allmessages = listOfMessages;
             }
             IOmessageResponse(message, status) {
                 console.log('message: ' + message + ';server: ' + status);
+                this.push('allmessages',new MessageObj(message, this.username, this.chatpartner))
+                //this.allmessages.push();
+                console.log(this.allmessages)
             }
             static get properties() {
                 return {
@@ -79,10 +83,10 @@
                     allmessages: {
                         type: Array
                     },
-                    chatPartner: {
+                    chatpartner: {
                         type: String
                     },
-                    availableChatPartners: {
+                    availablechatpartners: {
                         type: Array
                     },
                     username: {
