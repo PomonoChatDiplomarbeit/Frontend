@@ -13,6 +13,7 @@
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="./pomono-message.html">
 <link rel="import" href="./pomono-login-popup.html">
 <link rel="import" href="./socket-communicator.html">
@@ -97,52 +98,76 @@
         min-height: 100%;
       }
     </style>
-    <socket-communicator 
-          id="communicator" 
-          username="{{username}}" 
-          message="{{message}}" 
-          allmessages="{{allmessages}}"
-          chatpartner="{{chatPartner}}"
-          availablechatpartners="{{availableChatPartners}}">
+    <socket-communicator id="communicator" username="{{username}}" message="{{message}}" allmessages="{{allmessages}}" chatpartner="{{chatPartner}}"
+      availablechatpartners="{{availableChatPartners}}">
     </socket-communicator>
     <pomono-login-popup id="popup" isclicked="{{loginbuttonclicked}}"></pomono-login-popup>
     <newchat-overlay id="newChatOverlay"></newchat-overlay>
-    <app-drawer-layout>
-      <app-drawer id="drawer" swipe-open slot="drawer">
-        <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
-        <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
-        <paper-input value="{{username}}"></paper-input>
-        <paper-listbox class="chatPartnerDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
-          <template is="dom-repeat" items="{{availableChatPartners}}">
-            <chat-partner chatpartner="{{item}}"></chat-partner>
-          </template>
-        </paper-listbox>
-      </app-drawer>
-      <app-header-layout class="app-layout">
-        <app-header slot="header">
-          <app-toolbar>
-            <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
-            <div main-title>{{chatPartner}}</div>
-            <paper-icon-button icon="search"></paper-icon-button>
-          </app-toolbar>
-        </app-header>
-      </app-header-layout>
-      <div id="centerPanel">
-        <div class="my-content-wrapper">
-          <div id="listOfMessages" role="listbox">
-            <template is="dom-repeat" items="{{allmessages}}">
-              <pomono-message contact="{{item.sender}}" messagetext="{{item.text}}"></pomono-message>
-            </template>
+    <iron-pages selected="[[pageName]]" attr-for-selected="page-name" fallback-selection="primaryview">
+      <div page-name="primaryview">
+        <app-drawer-layout>
+          <app-drawer id="drawer" swipe-open slot="drawer" align="start">
+            <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
+            <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
+            <paper-input value="{{username}}"></paper-input>
+            <paper-listbox class="chatPartnerDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
+              <template is="dom-repeat" items="{{availableChatPartners}}">
+                <chat-partner chatpartner="{{item}}"></chat-partner>
+              </template>
+            </paper-listbox>
+          </app-drawer>
+          <app-drawer id="chatdetaildrawer" slot="drawer" align="end">
+            <div role="listbox">
+              <paper-icon-item>
+                <iron-icon icon="account-circle" slot="item-icon"></iron-icon>
+                {{chatPartner}}
+              </paper-icon-item>
+            </div>
+          </app-drawer>
+          <app-header-layout class="app-layout">
+            <app-header slot="header">
+              <app-toolbar>
+                <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
+                <div main-title>{{chatPartner}}</div>
+                <paper-icon-button icon="search"></paper-icon-button>
+                <paper-icon-button id="chatdetailtoggle" icon="more-vert"></paper-icon-button>
+              </app-toolbar>
+            </app-header>
+          </app-header-layout>
+          <div id="centerPanel">
+            <div class="my-content-wrapper">
+              <div id="listOfMessages" role="listbox">
+                <template is="dom-repeat" items="{{allmessages}}">
+                  <pomono-message contact="{{item.sender}}" messagetext="{{item.text}}"></pomono-message>
+                </template>
+              </div>
+            </div>
+            <div id="submissionBlock">
+              <paper-input id="message" label="Message" value="{{message}}">
+                <iron-icon icon="mail" slot="prefix"></iron-icon>
+                <paper-icon-button id="sendMessage" slot="suffix" icon="send"></paper-icon-button>
+              </paper-input>
+            </div>
           </div>
-        </div>
-        <div id="submissionBlock">
-          <paper-input id="message" label="Message" value="{{message}}">
-            <iron-icon icon="mail" slot="prefix"></iron-icon>
-            <paper-icon-button id="sendMessage" slot="suffix" icon="send"></paper-icon-button>
-          </paper-input>
-        </div>
+        </app-drawer-layout>
       </div>
-    </app-drawer-layout>
+      <div page-name="loginview">
+        <app-drawer-layout>
+          <app-header-layout class="app-layout">
+            <app-header slot="header">
+              <app-toolbar>
+                <div main-title>Please log in!</div>
+                <paper-icon-button id="btnswitchtoprimary" icon="close"></paper-icon-button>
+                <paper-progress value="10" indeterminate bottom-item></paper-progress>
+              </app-toolbar>
+            </app-header>
+          </app-header-layout>
+          <div>
+               <paper-button>Log in with google</paper-button>
+          </div>
+        </app-drawer-layout>
+      </div>
+    </iron-pages>
   </template>
 
   <script>
@@ -160,10 +185,19 @@
         this.$.sendMessage.addEventListener('click', e => { this._emitNewMessage(e) });
         //this.$.sendMessage.addEventListener('on-key-pressed', e => { this._keypressed(e) });
         this.$.menutoggle.addEventListener('click', e => { this._toggleDrawer(e) });
+        this.$.chatdetailtoggle.addEventListener('click', e => { this._togglechatdetail(e) });
         this.$.openlogin.addEventListener('click', e => { this._openLogin(e) });
+        this.$.btnswitchtoprimary.addEventListener('click', e => { this._switchtoprimary(e) });
+        
         this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) });
         //this._openLogin();
         this._loadAllChatPartners();
+      }
+      _switchtoprimary(){
+        this.pageName = "primaryview"
+      }
+      _togglechatdetail(e) {
+        this.$.chatdetaildrawer.toggle()
       }
       _openNewChatOverlay(e) {
         console.log('overlay triggered!');
@@ -178,6 +212,7 @@
         this._loginButtonClicked();
       }
       _loginButtonClicked() {
+        this.pageName = "loginview"
         this.$.communicator.login();
         this.$.communicator.getAllchatpartners();
         this.$.communicator.getAllMessagesForChat();
