@@ -38,15 +38,24 @@
             login() {
                 if (!this.loggedin) {
                     this.loggedin = true;
-                    this.socket.emit('login', this.username);
+                    this.socket.emit('login', this.user);
                     console.log('logged in via socket io');
                 }
             }
-            getAllchatpartners() {
+            getAllRooms() {
+                this.availablerooms = [];
+                /*this.push('availablerooms',new Room('room 1', '1', [], [
+                    new Message('Sandro', 'text', 'abc','8:56'),
+                    new Message('Dragan', 'text', 'cde','8:57')
+                ], 'S'));
+                this.push('availablerooms',new Room('room 2', '2', [], [
+                    new Message('sepi', 'text', 'abc','8:56'),
+                    new Message('pepi', 'text', 'cde','8:57')
+                ], 'S'));*/
                 this.socket.emit('getallchatpartners', this.username);
                 console.log('socket io getallchatpartners');
             }
-            getAllMessagesForChat() {
+            getAllMessagesForRoom() {
                 this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatpartner });
                 console.log('socket io getMessagesForChat');
             }
@@ -58,12 +67,13 @@
                 }
             }
             IOLoginResponse(status) {
-                console.log(status);
+                console.log(status.user);
+                this.user = status.user;
             }
             IOcPresponse(allchatpartners) {
                 console.log("Charpartners received count: " + allchatpartners.length);
                 console.log(allchatpartners);
-                this.availablechatpartners = allchatpartners;
+                this.availablerooms = allchatpartners;
             }
             IOmessagesResponse(listOfMessages) {
                 console.log('messages received for ' + this.chatpartner + ' count: ' + listOfMessages.length);
@@ -83,14 +93,14 @@
                     allmessages: {
                         type: Array
                     },
-                    chatpartner: {
+                    room: {
                         type: String
                     },
-                    availablechatpartners: {
+                    availablerooms: {
                         type: Array
                     },
-                    username: {
-                        type: String
+                    user: {
+                        type: Object
                     },
                     loggedin: {
                         type: Boolean,

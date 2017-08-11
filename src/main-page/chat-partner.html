@@ -16,7 +16,7 @@
     </style>
     <paper-icon-item class="chatPartnerDrawer">
         <!--<iron-image alt="chatpartner-Logo" src="[[picturename]]" slot="item-icon"></iron-image>-->
-        <paper-button>{{chatpartner}}</paper-button>
+        <paper-button>{{room.name}}</paper-button>
     </paper-icon-item>
   </template>
 
@@ -31,17 +31,17 @@
      */
     class ChatPartner extends Polymer.Element {
       static get is() { return 'chat-partner'; }
-      _computePicName(chatpartner) {
-          return '/src/chatPartnerIcons/' + chatpartner.substring(0,1).toUpperCase() + '.png'
+      _computePicName(room) {
+          return '/src/chatPartnerIcons/' + room.name.substring(0,1).toUpperCase() + '.png'
       }
       static get properties() {
         return {
-          chatpartner: {
-              type: String
+          room: {
+              type: Object
           },
           picturename: {
               type: String,
-              computed: '_computePicName(chatpartner)'
+              computed: '_computePicName(room)'
           }
         };
       }
