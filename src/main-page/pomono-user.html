@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/titanium-circle-letter-icon/titanium-circle-letter-icon.html">
+
+<dom-module id="pomono-user">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-icon-item>
+        <!--<iron-image alt="chatpartner-Logo" src="[[picturename]]" slot="item-icon"></iron-image>-->
+        <!--https://www.webcomponents.org/element/LssPolymerElements/titanium-circle-letter-icon-->
+        <titanium-circle-letter-icon text="{{user.username}}" slot="item-icon"></titanium-circle-letter-icon>
+        {{user.username}}
+    </paper-icon-item>
+  </template>
+
+  <script>
+    /**
+     * `pomono-user`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class RoomMember extends Polymer.Element {
+      static get is() { return 'pomono-user'; }
+      /*_computePicName(room) {
+          return '/src/chatPartnerIcons/' + room.name.substring(0,1).toUpperCase() + '.png'
+      }*/
+      static get properties() {
+        return {
+          user: {
+              type: Object
+          }
+        };
+      }
+    }
+
+    window.customElements.define(RoomMember.is,  RoomMember);
+  </script>
+</dom-module>

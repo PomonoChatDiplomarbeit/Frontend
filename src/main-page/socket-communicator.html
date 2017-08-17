@@ -29,8 +29,8 @@
                 if (!this.loggedin) {
                     this.socket = io.connect('http://127.0.0.1:8080/');
                     this.socket.on('loginResponse', data => { this.IOLoginResponse(data) });
-                    this.socket.on('cPResponse', data => { this.IOcPresponse(allchatpartners) });
-                    this.socket.on('messagesResponse', data => { this.IOmessagesResponse(listOfMessages) });
+                    this.socket.on('roomResponse', data => { this.IORoomPresponse(data) });
+                    this.socket.on('messagesResponse', data => { this.IOmessagesResponse(data) });
                     this.socket.on('messageResponse', data => { this.IOmessageResponse(data.textToDisplay, data.status) });
                 }
             }
@@ -43,7 +43,7 @@
                 }
             }
             getAllRooms() {
-                this.availablerooms = [];
+                //this.availablerooms = [];
                 /*this.push('availablerooms',new Room('room 1', '1', [], [
                     new Message('Sandro', 'text', 'abc','8:56'),
                     new Message('Dragan', 'text', 'cde','8:57')
@@ -52,28 +52,45 @@
                     new Message('sepi', 'text', 'abc','8:56'),
                     new Message('pepi', 'text', 'cde','8:57')
                 ], 'S'));*/
-                this.socket.emit('getallchatpartners', this.username);
-                console.log('socket io getallchatpartners');
-            }
+                this.socket.emit('getAllRooms', this.user);
+                console.log('socket io getallrooms');
+            }   
             getAllMessagesForRoom() {
                 this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatpartner });
                 console.log('socket io getMessagesForChat');
             }
             emitMessage() {
                 if (this.loggedin) {
-                    var toemit = new MessageObj(this.message,this.username,this.chatpartner)
-                    this.socket.emit('pushMessage', toemit);
+                    var toemit = new Message(this.user,'text',this.message,'now');
+                    this.socket.emit('pushMessageRoom', this.room.id, toemit);
                     console.log(toemit);
-                }
+                } 
             }
             IOLoginResponse(status) {
                 console.log(status.user);
                 this.user = status.user;
             }
-            IOcPresponse(allchatpartners) {
-                console.log("Charpartners received count: " + allchatpartners.length);
-                console.log(allchatpartners);
-                this.availablerooms = allchatpartners;
+            IORoomPresponse(allRooms) {
+                //this.set('availablerooms', []);
+                console.log("Rooms received count: " + allRooms.length);
+                //console.log(allRooms);
+                console.log(this.availablerooms);
+                /*this.set('availablerooms', [
+                    new Room('room 1', '1', [new User("Sandro")], [
+                        new Message('Sandro', 'text', 'abc','8:56'),
+                        new Message('Dragan', 'text', 'cde','8:57')
+                    ], 'S'),
+                    new Room('room 2', '2', [], [
+                        new Message('sepi', 'text', 'abc','8:56'),
+                        new Message('pepi', 'text', 'cde','8:57')
+                    ], 'S')
+                ]);*/
+                this.set('availablerooms', []);
+                this.set('availablerooms', allRooms);
+                console.log(this.availablerooms);
+                //this.notifyPath('availablerooms', allRooms);
+                //this.message = 'ok';
+                //console.log(this.availablerooms);    
             }
             IOmessagesResponse(listOfMessages) {
                 console.log('messages received for ' + this.chatpartner + ' count: ' + listOfMessages.length);

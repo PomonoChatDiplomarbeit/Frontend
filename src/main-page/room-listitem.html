@@ -1,0 +1,51 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/titanium-circle-letter-icon/titanium-circle-letter-icon.html">
+
+<dom-module id="room-listitem">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-icon-item>
+        <!--<iron-image alt="chatpartner-Logo" src="[[picturename]]" slot="item-icon"></iron-image>-->
+        <titanium-circle-letter-icon text="{{room.name}}" slot="item-icon"></titanium-circle-letter-icon>
+        <paper-button>{{room.name}}</paper-button>
+    </paper-icon-item>
+  </template>
+
+  <script>
+    /**
+     * `chat-partner`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class RoomListItem extends Polymer.Element {
+      static get is() { return 'room-listitem'; }
+      /*_computePicName(room) {
+          return '/src/chatPartnerIcons/' + room.name.substring(0,1).toUpperCase() + '.png'
+      }*/
+      static get properties() {
+        return {
+          room: {
+              type: Object
+          },
+          picturename: {
+              type: String/*,
+              computed: '_computePicName(room)'*/
+          }
+        };
+      }
+    }
+
+    window.customElements.define(RoomListItem.is, RoomListItem);
+  </script>
+</dom-module>

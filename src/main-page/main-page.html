@@ -7,24 +7,37 @@
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/titanium-circle-letter-icon/titanium-circle-letter-icon.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="./pomono-message.html">
+<link rel="import" href="./pomono-user.html">
 <link rel="import" href="./pomono-login-popup.html">
 <link rel="import" href="./socket-communicator.html">
-<link rel="import" href="./chat-partner.html">
+<link rel="import" href="./room-listitem.html">
 <link rel="import" href="./newchat-overlay.html">
 <dom-module id="main-page">
   <template>
     <style is="custom-style">
        :host {
         display: block;
-        padding: 10px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
       }
 
       paper-button {
@@ -46,16 +59,16 @@
 
       html,
       body {
-        margin: 0;
         font-family: 'Roboto', 'Noto', sans-serif;
         -webkit-font-smoothing: antialiased;
         background-color: #FFCCBC;
-        max-height: 368px;
+        height: 100%;
       }
 
       app-toolbar {
         background-color: #E64A19;
         color: #fff;
+        text-align: center;
       }
 
       paper-icon-button {
@@ -97,43 +110,74 @@
       .app-layout {
         min-height: 100%;
       }
+
+      #createRoomPage {}
+
+      .createRoomPaperCard {
+        max-width: 500px;
+        vertical-align: middle;
+        background-color: #E8EAF6;
+      }
     </style>
-    <socket-communicator id="communicator" user="{{user}}" message="{{message}}" allmessages="{{allmessages}}" room="{{room}}"
-      availablerooms="{{availablerooms}}">
+    <socket-communicator id="communicator" user="{{user}}" message="{{message}}" room="{{room}}" availablerooms="{{availablerooms}}">
     </socket-communicator>
-    <pomono-login-popup id="popup" isclicked="{{loginbuttonclicked}}"></pomono-login-popup>
     <newchat-overlay id="newChatOverlay"></newchat-overlay>
     <iron-pages selected="[[pageName]]" attr-for-selected="page-name" fallback-selection="primaryview">
       <div page-name="primaryview">
         <app-drawer-layout>
-          <app-drawer id="drawer" swipe-open slot="drawer" align="start">
-            <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
-            <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
-            <paper-input value="{{user.username}}"></paper-input>
-            <paper-listbox class="roomDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
-              <template is="dom-repeat" items="{{availablerooms}}">
-                <chat-partner room="{{item}}"></chat-partner>
-              </template>
-            </paper-listbox>
+          <!--left drawer-->
+          <app-drawer id="drawer" swipe-open slot="drawer" align="start" persistent>
+            <paper-toolbar>
+              <div slot="top">
+                <paper-icon-button id="openlogin" icon="account-circle"></paper-icon-button>
+                <paper-icon-button id="createNewChat" icon="add"></paper-icon-button>
+              </div>
+            </paper-toolbar>
+            <paper-card image="/src/pictures/leftdrawer.png">
+              <paper-listbox class="roomDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
+                <template is="dom-repeat" items="{{availablerooms}}">
+                  <div class="horizontal justified">
+                    <room-listitem room="{{item}}"></room-listitem>
+                  </div>
+                </template>
+              </paper-listbox>
+            </paper-card>
           </app-drawer>
+          <!--right drawer-->
           <app-drawer id="chatdetaildrawer" slot="drawer" align="end">
             <div role="listbox">
-              <paper-icon-item>
-                <iron-icon icon="account-circle" slot="item-icon"></iron-icon>
-                {{room.name}}
-              </paper-icon-item>
+
+              <paper-toolbar>
+                <paper-icon-item slot="top" main-title>
+                  <iron-icon icon="account-circle" slot="item-icon"></iron-icon>
+                  {{room.name}}
+                </paper-icon-item>
+              </paper-toolbar>
+
+              <paper-listbox id="lBallMembersOfRoom" fallback-selection="0">
+                <template is="dom-repeat" items="{{allMembersOfRoom}}">
+                  <pomono-user user="{{item}}"></pomono-user>
+                </template>
+              </paper-listbox>
             </div>
           </app-drawer>
           <app-header-layout class="app-layout">
-            <app-header slot="header">
+            <!--app header-->
+            <app-header slot="header" fixed>
               <app-toolbar>
-                <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
+                <!--<dom-bind>
+                  <template is="dom-if" if="{{!isDesktop}}">-->
+                    <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
+                  <!--</template>
+                </dom-bind>-->
+
                 <div main-title>{{room.name}}</div>
-                <paper-icon-button icon="search"></paper-icon-button>
+                <!--<paper-icon-button icon="search"></paper-icon-button>-->
                 <paper-icon-button id="chatdetailtoggle" icon="more-vert"></paper-icon-button>
               </app-toolbar>
             </app-header>
           </app-header-layout>
+          <!--center panel-->
           <div id="centerPanel">
             <div class="my-content-wrapper">
               <div id="listOfMessages" role="listbox">
@@ -151,14 +195,15 @@
           </div>
         </app-drawer-layout>
       </div>
+      <!--login page-->
       <div page-name="loginview">
         <app-drawer-layout>
           <app-header-layout class="app-layout">
             <app-header slot="header">
               <app-toolbar>
                 <div main-title>Please log in!</div>
+                <paper-spinner active>...</paper-spinner>
                 <paper-icon-button id="btnswitchtoprimary" icon="close"></paper-icon-button>
-                <paper-progress value="10" indeterminate bottom-item></paper-progress>
               </app-toolbar>
             </app-header>
           </app-header-layout>
@@ -169,7 +214,36 @@
           </div>
         </app-drawer-layout>
       </div>
+      <!--create Room page-->
+      <div page-name="createRoom" id="createRoomPage">
+        <app-header-layout>
+          <app-header fixed slot="header">
+            <app-toolbar>
+              <div main-title>Create Room</div>
+              <paper-icon-button id="btnswitchtoprimaryfromnewroom" icon="close"></paper-icon-button>
+            </app-toolbar>
+          </app-header>
+          <div>
+            <paper-card image="/src/pictures/material_createRoom.png" class="createRoomPaperCard">
+              <iron-label>
+                <!--<h2 style="text-align: center">What do you want to Start?</h2></br>-->
+                What do you want to Start?
+                <paper-radio-group id="createRoomRadioGroup" selected="{{createRoomRadioGroupSelected}}" fall>
+                  <paper-radio-button name="chat">Chat</paper-radio-button>
+                  <paper-radio-button name="group">Group</paper-radio-button>
+                </paper-radio-group>
+              </iron-label>
+              <dom-bind>
+                <template is="dom-if" if="{{isGroup}}">
+                  <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newRoomName}}"></paper-input>
+                </template>
+              </dom-bind>
+            </paper-card>
+          </div>
+        </app-header-layout>
+      </div>
     </iron-pages>
+    <iron-media-query query="min-width: 600px" query-matches="{{isDesktop}}"></iron-media-query>
   </template>
 
   <script>
@@ -177,7 +251,6 @@
      * @customElement
      * @polymer
      */
-    //todo: alle Klassen auslagern
 
 
     class MainPage extends Polymer.Element {
@@ -190,20 +263,26 @@
         this.$.chatdetailtoggle.addEventListener('click', e => { this._togglechatdetail(e) });
         this.$.openlogin.addEventListener('click', e => { this._openLogin(e) });
         this.$.btnswitchtoprimary.addEventListener('click', e => { this._switchtoprimary(e) });
+        this.$.btnswitchtoprimaryfromnewroom.addEventListener('click', e => { this._switchtoprimary(e) });
         this.$.loginviewloginbutton.addEventListener('click', e => { this._loginButtonClicked(e) });
-
         this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) });
+
+        /*if (this.isDesktop) {
+          this.$.drawer.open();
+        }*/
         this._openLogin();
-        this._loadAllrooms();
+        //this._loadAllrooms();
       }
       _switchtoprimary() {
         this.pageName = "primaryview"
       }
       _togglechatdetail(e) {
+        console.log('chatdetail toggled!')
         this.$.chatdetaildrawer.toggle()
       }
       _openNewChatOverlay(e) {
         console.log('overlay triggered!');
+        this.pageName = "createRoom"
       }
       _keypressed(e) {
         console.log('key pressed');
@@ -216,6 +295,10 @@
         this.pageName = "loginview"
       }
       _loginButtonClicked() {
+        console.log('entered')
+        console.log(this.user)
+        //this.user = new User('username')
+        console.log(this.user)
         this.$.communicator.loggedin = false;
         this.$.communicator.login();
         this.$.communicator.getAllRooms();
@@ -227,10 +310,7 @@
       _emitNewMessage(e) {
         if (this.message != undefined && this.message != "") {
           this.$.communicator.emitMessage();
-          //this._loadAllrooms();
-          //this._roomChanged();
-          //this.push('allmessages', new MessageObj(this.message, "Fabian", this.room));
-          console.info('Message:' + this.message);
+          console.log('User: ' + this.user.username + ';Message:' + this.message);
         } else {
           //this.$.communicator.connectToSocketIO();
         }
@@ -241,7 +321,9 @@
       }
       _toggleDrawer(e) {
         console.log("Drawer toggled!");
-        this.$.drawer.toggle();
+        if (!this.isDesktop) {
+          this.$.drawer.toggle();
+        }
       }
       _computeSelectedItem(selectedID) {
         this.message = "";
@@ -251,8 +333,20 @@
       _loadAllrooms() {
         //this.availablerooms = this.communicator.getAllrooms();
       }
-      _loadMessageForSelectedRoom(room){
+      _loadMessageForSelectedRoom(room) {
         return room.messages;
+      }
+      _temptest() {
+        console.log('recognized')
+      }
+      _getAllMembersOfRoom(room) {
+        return room.users;
+      }
+      _processisChat(createRoomRadioGroupSelected) {
+        return (createRoomRadioGroupSelected == 'chat');
+      }
+      _processisGroup(createRoomRadioGroupSelected) {
+        return (createRoomRadioGroupSelected == 'group');
       }
       static get properties() {
         return {
@@ -266,31 +360,52 @@
           },
           allmessages: {
             type: Array,
-            value: [],
             computed: '_loadMessageForSelectedRoom(room)'
           },
           room: {
             type: String,
-            value: [],
             computed: '_computeSelectedItem(selectedID)',
             observer: '_roomChanged'
           },
           availablerooms: {
             type: Array,
             value: [
-                new Room('room 1', '1', [], [
-                    new Message('Sandro', 'text', 'abc','8:56'),
-                    new Message('Dragan', 'text', 'cde','8:57')
+              new Room('room 1', '1', [
+                new User("Sandro"),
+                new User("Dragan"),
+                new User("Tschofe")
+              ], [
+                  new Message('Sandro', 'text', 'abc', '8:56'),
+                  new Message('Dragan', 'text', 'cde', '8:57')
                 ], 'S'),
-                new Room('room 2', '2', [], [
-                    new Message('sepi', 'text', 'abc','8:56'),
-                    new Message('pepi', 'text', 'cde','8:57')
+              new Room('room 2', '2', [
+                new User("sepi")
+              ], [
+                  new Message('sepi', 'text', 'abc', '8:56'),
+                  new Message('pepi', 'text', 'cde', '8:57')
                 ], 'S')
-            ]
+            ],
+            observer: '_temptest'
           },
           user: {
             type: Object,
-            value: new User('undefined')
+            value: new User('default')
+          },
+          allMembersOfRoom: {
+            type: Array,
+            computed: '_getAllMembersOfRoom(room)'
+          },
+          createRoomRadioGroupSelected: {
+            type: String,
+            value: 'chat'
+          },
+          isChat: {
+            type: Boolean,
+            computed: '_processisChat(createRoomRadioGroupSelected)'
+          },
+          isGroup: {
+            type: Boolean,
+            computed: '_processisGroup(createRoomRadioGroupSelected)'
           }
         }
       }
