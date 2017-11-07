@@ -56,6 +56,7 @@
         }
         ;
       }
+      
 
       html,
       body {
@@ -227,17 +228,29 @@
             <paper-card image="/src/pictures/material_createRoom.png" class="createRoomPaperCard">
               <iron-label>
                 <!--<h2 style="text-align: center">What do you want to Start?</h2></br>-->
-                What do you want to Start?
+                <!--What do you want to Start?
                 <paper-radio-group id="createRoomRadioGroup" selected="{{createRoomRadioGroupSelected}}" fall>
                   <paper-radio-button name="chat">Chat</paper-radio-button>
                   <paper-radio-button name="group">Group</paper-radio-button>
-                </paper-radio-group>
+                </paper-radio-group>-->
               </iron-label>
-              <dom-bind>
+              <!--<dom-bind>
                 <template is="dom-if" if="{{isGroup}}">
                   <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newRoomName}}"></paper-input>
                 </template>
-              </dom-bind>
+              </dom-bind>-->
+              <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newRoomName}}"></paper-input>
+              <paper-input id="newUserForRoom" label="Username" value="{{newuserforroom}}">
+                <paper-icon-button id="addUserToNewRoom" slot="suffix" icon="add"></paper-icon-button>
+              </paper-input>
+              <paper-button is="btncreatenewroom">
+                Create New Room Now
+              </paper-button>
+              <div id="listOfNewUsersForNewRoom" role="listbox">
+                <template is="dom-repeat" items="{{usersForNewRoom}}">
+                  <div>[[item]]</div>
+                </template>
+              </div>
             </paper-card>
           </div>
         </app-header-layout>
@@ -265,13 +278,19 @@
         this.$.btnswitchtoprimary.addEventListener('click', e => { this._switchtoprimary(e) });
         this.$.btnswitchtoprimaryfromnewroom.addEventListener('click', e => { this._switchtoprimary(e) });
         this.$.loginviewloginbutton.addEventListener('click', e => { this._loginButtonClicked(e) });
-        this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) });
+        this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) }); 
+        this.$.addUserToNewRoom.addEventListener('click', e => { this._addUserToNewRoom(e) });
 
         /*if (this.isDesktop) {
           this.$.drawer.open();
         }*/
         this._openLogin();
         //this._loadAllrooms();
+      }
+      _addUserToNewRoom(e) {
+        console.log(this.usersForNewRoom);
+        //this.usersForNewRoom.push('user');
+        this.push('usersForNewRoom',this.newuserforroom)
       }
       _switchtoprimary() {
         this.pageName = "primaryview"
@@ -406,6 +425,13 @@
           isGroup: {
             type: Boolean,
             computed: '_processisGroup(createRoomRadioGroupSelected)'
+          },
+          usersForNewRoom: {
+            type: Array,
+            value: [
+              'user1',
+              'user2'
+            ]
           }
         }
       }
