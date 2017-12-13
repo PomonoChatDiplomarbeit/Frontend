@@ -27,8 +27,8 @@
             }
             connectToSocketIO() {
                 if (!this.loggedin) {
-                    this.socket = io.connect('http://127.0.0.1:8080/');
-                    this.socket.on('loginResponse', data => { this.IOLoginResponse(data) });
+                    this.socket = io.connect('http://127.0.0.1:3000/');
+                    this.socket.on('login-response', data => { this.IOLoginResponse(data) });
                     this.socket.on('roomResponse', data => { this.IORoomPresponse(data) });
                     this.socket.on('messagesResponse', data => { this.IOmessagesResponse(data) });
                     this.socket.on('messageResponse', data => { this.IOmessageResponse(data.textToDisplay, data.status) });
@@ -37,9 +37,8 @@
 
             login() {
                 if (!this.loggedin) {
-                    this.loggedin = true;
                     this.socket.emit('login', this.user);
-                    console.log('logged in via socket io');
+                    console.log('trying to login');
                 }
             }
             getAllRooms() {
@@ -54,21 +53,31 @@
                 ], 'S'));*/
                 this.socket.emit('getAllRooms', this.user);
                 console.log('socket io getallrooms');
-            }   
+            }
             getAllMessagesForRoom() {
                 this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatpartner });
                 console.log('socket io getMessagesForChat');
             }
             emitMessage() {
                 if (this.loggedin) {
-                    var toemit = new Message(this.user,'text',this.message,'now');
+                    var toemit = new Message(this.user, 'text', this.message, 'now');
                     this.socket.emit('pushMessageRoom', this.room.id, toemit);
                     console.log(toemit);
-                } 
+                }
+            }
+            createRoom(roomName, usernames) {
+                if (this.loggedin) {
+                    this.socket.emit('createNewRoom', { roomName: roomName, usernames });
+                    console.log('New Room created:' + roomName);
+                }
             }
             IOLoginResponse(status) {
-                console.log(status.user);
-                this.user = status.user;
+                console.log('login-status' + status)
+                if (status == 'OK')
+                    this.set('loggedin', true);
+                else
+                    this.set('loggedin', false);
+                console.log(this.loggedin);
             }
             IORoomPresponse(allRooms) {
                 //this.set('availablerooms', []);
@@ -98,7 +107,7 @@
             }
             IOmessageResponse(message, status) {
                 console.log('message: ' + message + ';server: ' + status);
-                this.push('allmessages',new MessageObj(message, this.username, this.chatpartner))
+                this.push('allmessages', new MessageObj(message, this.username, this.chatpartner))
                 //this.allmessages.push();
                 console.log(this.allmessages)
             }
@@ -121,7 +130,8 @@
                     },
                     loggedin: {
                         type: Boolean,
-                        value: false
+                        value: false,
+                        notify: true
                     }
                 };
             }
