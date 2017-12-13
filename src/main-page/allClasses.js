@@ -7,9 +7,8 @@ class Message {
     }
 }
 class User {
-    constructor(username, pwd) {
+    constructor(username) {
         this.username = username
-        this.pwd = pwd
     }
 }
 class Room {

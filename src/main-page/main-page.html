@@ -31,7 +31,7 @@
 <dom-module id="main-page">
   <template>
     <style is="custom-style">
-      :host {
+       :host {
         display: block;
         position: absolute;
         left: 0;
@@ -56,7 +56,7 @@
         }
         ;
       }
-
+      
 
       html,
       body {
@@ -120,7 +120,7 @@
         background-color: #E8EAF6;
       }
     </style>
-    <socket-communicator id="communicator" loggedin="{{loggedin}}" user="{{user}}" message="{{message}}" room="{{room}}" availablerooms="{{availablerooms}}">
+    <socket-communicator id="communicator" user="{{user}}" message="{{message}}" room="{{room}}" availablerooms="{{availablerooms}}">
     </socket-communicator>
     <newchat-overlay id="newChatOverlay"></newchat-overlay>
     <iron-pages selected="[[pageName]]" attr-for-selected="page-name" fallback-selection="primaryview">
@@ -168,8 +168,8 @@
               <app-toolbar>
                 <!--<dom-bind>
                   <template is="dom-if" if="{{!isDesktop}}">-->
-                <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
-                <!--</template>
+                    <paper-icon-button id="menutoggle" icon="menu"></paper-icon-button>
+                  <!--</template>
                 </dom-bind>-->
 
                 <div main-title>{{room.name}}</div>
@@ -209,12 +209,9 @@
             </app-header>
           </app-header-layout>
           <div>
-            <paper-button id="createtestdata">create test data</paper-button>
-            <!--<paper-button>Log in with google</paper-button>-->
+            <paper-button>Log in with google</paper-button>
             <paper-input always-float-label label="Username" value="{{user.username}}"></paper-input>
-            <paper-input always-float-label label="Password" value="{{user.pwd}}"></paper-input>
             <paper-button id="loginviewloginbutton">Log in</paper-button>
-            <div>{{loggedin}}</div>
           </div>
         </app-drawer-layout>
       </div>
@@ -242,11 +239,11 @@
                   <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newRoomName}}"></paper-input>
                 </template>
               </dom-bind>-->
-              <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newroomname}}"></paper-input>
+              <paper-input id="createRoomNewRoomName" label="Group-Name" value="{{newRoomName}}"></paper-input>
               <paper-input id="newUserForRoom" label="Username" value="{{newuserforroom}}">
                 <paper-icon-button id="addUserToNewRoom" slot="suffix" icon="add"></paper-icon-button>
               </paper-input>
-              <paper-button id="btncreatenewroom">
+              <paper-button is="btncreatenewroom">
                 Create New Room Now
               </paper-button>
               <div id="listOfNewUsersForNewRoom" role="listbox">
@@ -278,12 +275,11 @@
         this.$.menutoggle.addEventListener('click', e => { this._toggleDrawer(e) });
         this.$.chatdetailtoggle.addEventListener('click', e => { this._togglechatdetail(e) });
         this.$.openlogin.addEventListener('click', e => { this._openLogin(e) });
-        //this.$.btnswitchtoprimary.addEventListener('click', e => { this._switchtoprimary(e) });
+        this.$.btnswitchtoprimary.addEventListener('click', e => { this._switchtoprimary(e) });
         this.$.btnswitchtoprimaryfromnewroom.addEventListener('click', e => { this._switchtoprimary(e) });
         this.$.loginviewloginbutton.addEventListener('click', e => { this._loginButtonClicked(e) });
-        this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) });
+        this.$.createNewChat.addEventListener('click', e => { this._openNewChatOverlay(e) }); 
         this.$.addUserToNewRoom.addEventListener('click', e => { this._addUserToNewRoom(e) });
-        this.$.btncreatenewroom.addEventListener('click', e => { this._createNewRoom(e) });
 
         /*if (this.isDesktop) {
           this.$.drawer.open();
@@ -291,14 +287,10 @@
         this._openLogin();
         //this._loadAllrooms();
       }
-      _createNewRoom(e) {
-        this.$.communicator.createRoom(this.newroomname, this.newuserforroom);
-        this._switchtoprimary();
-      }
       _addUserToNewRoom(e) {
         console.log(this.usersForNewRoom);
         //this.usersForNewRoom.push('user');
-        this.push('usersForNewRoom', this.newuserforroom)
+        this.push('usersForNewRoom',this.newuserforroom)
       }
       _switchtoprimary() {
         this.pageName = "primaryview"
@@ -322,12 +314,16 @@
         this.pageName = "loginview"
       }
       _loginButtonClicked() {
+        console.log('entered')
+        console.log(this.user)
+        //this.user = new User('username')
+        console.log(this.user)
         this.$.communicator.loggedin = false;
         this.$.communicator.login();
-        /*this.$.communicator.getAllRooms();
+        this.$.communicator.getAllRooms();
         console.log(this.availablerooms);
         this.$.communicator.getAllMessagesForRoom();
-        this.pageName = "primaryview";*/
+        this.pageName = "primaryview";
         //this._toggleDrawer();
       }
       _emitNewMessage(e) {
@@ -354,7 +350,7 @@
         return this.availablerooms[selectedID];
       }
       _loadAllrooms() {
-        //this.availablerooms = this.communicator.getAllrooms();
+        this.communicator.getAllrooms();
       }
       _loadMessageForSelectedRoom(room) {
         return room.messages;
@@ -371,17 +367,6 @@
       _processisGroup(createRoomRadioGroupSelected) {
         return (createRoomRadioGroupSelected == 'group');
       }
-      _loginstatechanged(createRoomRadioGroupSelected) {
-        if (this.loggedin)
-          this._loadEverything();
-        else
-          this.pageName = "loginview";
-      }
-      _loadEverything() {
-        //todo: implement
-        this._switchtoprimary();
-      }
-
       static get properties() {
         return {
           greeting: {
@@ -447,11 +432,6 @@
               'user1',
               'user2'
             ]
-          },
-          loggedin: {
-            type: Boolean,
-            notify: true,
-            observer: '_loginstatechanged'
           }
         }
       }
