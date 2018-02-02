@@ -120,7 +120,8 @@
         background-color: #E8EAF6;
       }
     </style>
-    <socket-communicator id="communicator" loggedin="{{loggedin}}" user="{{user}}" message="{{message}}" room="{{room}}" availablerooms="{{availablerooms}}">
+    <socket-communicator id="communicator" room="{{room}}" loggedin="{{loggedin}}" user="{{user}}" message="{{message}}" rooms="{{rooms}}"
+      availablerooms="{{availablerooms}}">
     </socket-communicator>
     <newchat-overlay id="newChatOverlay"></newchat-overlay>
     <iron-pages selected="[[pageName]]" attr-for-selected="page-name" fallback-selection="primaryview">
@@ -136,7 +137,7 @@
             </paper-toolbar>
             <paper-card image="/src/pictures/leftdrawer.png">
               <paper-listbox class="roomDrawer" id="allChats" selected="{{selectedID}}" fallback-selection="0">
-                <template is="dom-repeat" items="{{availablerooms}}">
+                <template is="dom-repeat" items="{{rooms}}">
                   <div class="horizontal justified">
                     <room-listitem room="{{item}}"></room-listitem>
                   </div>
@@ -182,7 +183,7 @@
           <div id="centerPanel">
             <div class="my-content-wrapper">
               <div id="listOfMessages" role="listbox">
-                <template is="dom-repeat" items="{{allmessages}}">
+                <template is="dom-repeat" items="{{room.messages}}">
                   <pomono-message contact="{{item.sender}}" messagetext="{{item.data}}"></pomono-message>
                 </template>
               </div>
@@ -250,7 +251,7 @@
                 Create New Room Now
               </paper-button>
               <div id="listOfNewUsersForNewRoom" role="listbox">
-                <template is="dom-repeat" items="{{usersForNewRoom}}">
+                <template is="dom-repeat" items="{{usersfornewroom}}">
                   <div>[[item]]</div>
                 </template>
               </div>
@@ -292,13 +293,16 @@
         //this._loadAllrooms();
       }
       _createNewRoom(e) {
-        this.$.communicator.createRoom(this.newroomname, this.newuserforroom);
+        this.$.communicator.createRoom(this.newroomname, this.usersfornewroom);
         this._switchtoprimary();
       }
       _addUserToNewRoom(e) {
-        console.log(this.usersForNewRoom);
+        console.log(this.usersfornewroom);
         //this.usersForNewRoom.push('user');
-        this.push('usersForNewRoom', this.newuserforroom)
+        if (this.usersfornewroom == undefined)
+          this.set('usersfornewroom', [this.newuserforroom]);
+        else
+          this.push('usersfornewroom', this.newuserforroom)
       }
       _switchtoprimary() {
         this.pageName = "primaryview"
@@ -351,19 +355,21 @@
       _computeSelectedItem(selectedID) {
         this.message = "";
         this._toggleDrawer();
-        return this.availablerooms[selectedID];
+        return this.rooms[selectedID];
       }
       _loadAllrooms() {
-        //this.availablerooms = this.communicator.getAllrooms();
+        this.$.communicator.getAllrooms();
       }
       _loadMessageForSelectedRoom(room) {
+        console.log('change recognized');
+        this.set('messages', room.messages);
         return room.messages;
       }
       _temptest() {
         console.log('recognized')
       }
       _getAllMembersOfRoom(room) {
-        return room.users;
+        return room.members;
       }
       _processisChat(createRoomRadioGroupSelected) {
         return (createRoomRadioGroupSelected == 'chat');
@@ -377,9 +383,25 @@
         else
           this.pageName = "loginview";
       }
+      _getavailableRooms(rooms) {
+        return rooms.map(e => {
+          return e.name;
+        });
+      }
       _loadEverything() {
         //todo: implement
         this._switchtoprimary();
+        this._loadAllrooms();
+      }
+      _updatemessages() {
+        this.set('allmessages', this.room.messages);
+      }
+      _updateall() {
+        this.set('room', this.rooms[this.selectedID]);
+        //this.room = this.rooms[this.selectedID];
+        console.log(this.room);
+        console.log(this.rooms[this.selectedID]);
+        this.notifyPath('room');
       }
 
       static get properties() {
@@ -393,33 +415,23 @@
             value: ""
           },
           allmessages: {
-            type: Array,
-            computed: '_loadMessageForSelectedRoom(room)'
+            type: Array/*,
+            computed: '_loadMessageForSelectedRoom(room)'*/
           },
           room: {
             type: String,
-            computed: '_computeSelectedItem(selectedID)',
-            observer: '_roomChanged'
+            //computed: '_computeSelectedItem(selectedID)',
+            observer: '_updatemessages'
           },
           availablerooms: {
             type: Array,
-            value: [
-              new Room('room 1', '1', [
-                new User("Sandro"),
-                new User("Dragan"),
-                new User("Tschofe")
-              ], [
-                  new Message('Sandro', 'text', 'abc', '8:56'),
-                  new Message('Dragan', 'text', 'cde', '8:57')
-                ], 'S'),
-              new Room('room 2', '2', [
-                new User("sepi")
-              ], [
-                  new Message('sepi', 'text', 'abc', '8:56'),
-                  new Message('pepi', 'text', 'cde', '8:57')
-                ], 'S')
-            ],
-            observer: '_temptest'
+            observer: '_temptest',
+            computed: '_getavailableRooms(rooms)'
+          },
+          rooms: {
+            type: Array,
+            notify: true,
+            observer: '_updateall'
           },
           user: {
             type: Object,
@@ -429,7 +441,7 @@
             type: Array,
             computed: '_getAllMembersOfRoom(room)'
           },
-          createRoomRadioGroupSelected: {
+          Selected: {
             type: String,
             value: 'chat'
           },
@@ -441,17 +453,18 @@
             type: Boolean,
             computed: '_processisGroup(createRoomRadioGroupSelected)'
           },
-          usersForNewRoom: {
+          usersfornewroom: {
             type: Array,
-            value: [
-              'user1',
-              'user2'
-            ]
+            value: []
           },
           loggedin: {
             type: Boolean,
             notify: true,
             observer: '_loginstatechanged'
+          },
+          selectedID: {
+            type: Number,
+            observer: '_updateall'
           }
         }
       }

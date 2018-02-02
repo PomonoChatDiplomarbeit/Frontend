@@ -29,7 +29,9 @@
                 if (!this.loggedin) {
                     this.socket = io.connect('http://127.0.0.1:3000/');
                     this.socket.on('login-response', data => { this.IOLoginResponse(data) });
-                    this.socket.on('roomResponse', data => { this.IORoomPresponse(data) });
+                    this.socket.on('room-response', data => { this.IORoomPresponse(data) });
+                    this.socket.on('reloadRooms', data => { this.IOreloadRooms(data) });
+                    this.socket.on('createRoom-response', data => { this.IOreloadRooms(data) });
                     this.socket.on('messagesResponse', data => { this.IOmessagesResponse(data) });
                     this.socket.on('messageResponse', data => { this.IOmessageResponse(data.textToDisplay, data.status) });
                 }
@@ -41,18 +43,9 @@
                     console.log('trying to login');
                 }
             }
-            getAllRooms() {
-                //this.availablerooms = [];
-                /*this.push('availablerooms',new Room('room 1', '1', [], [
-                    new Message('Sandro', 'text', 'abc','8:56'),
-                    new Message('Dragan', 'text', 'cde','8:57')
-                ], 'S'));
-                this.push('availablerooms',new Room('room 2', '2', [], [
-                    new Message('sepi', 'text', 'abc','8:56'),
-                    new Message('pepi', 'text', 'cde','8:57')
-                ], 'S'));*/
-                this.socket.emit('getAllRooms', this.user);
-                console.log('socket io getallrooms');
+            getAllrooms() { 
+                this.socket.emit('load rooms for user', this.user.username);
+                console.log('socket io load rooms for user');
             }
             getAllMessagesForRoom() {
                 this.socket.emit('getMessagesForChat', { user: this.username, partner: this.chatpartner });
@@ -60,14 +53,19 @@
             }
             emitMessage() {
                 if (this.loggedin) {
-                    var toemit = new Message(this.user, 'text', this.message, 'now');
-                    this.socket.emit('pushMessageRoom', this.room.id, toemit);
+                    //var toemit = new Message(this.user.username, 'text', this.message, 'now');
+                    var toemit = {
+                        sender: this.user.username,
+                        type: "text",
+                        data: this.message
+                    };
+                    this.socket.emit('add message to room', this.room._id, toemit);
                     console.log(toemit);
                 }
             }
             createRoom(roomName, usernames) {
                 if (this.loggedin) {
-                    this.socket.emit('createNewRoom', { roomName: roomName, usernames });
+                    this.socket.emit('createNewRoom', roomName,usernames);
                     console.log('New Room created:' + roomName);
                 }
             }
@@ -80,26 +78,8 @@
                 console.log(this.loggedin);
             }
             IORoomPresponse(allRooms) {
-                //this.set('availablerooms', []);
-                console.log("Rooms received count: " + allRooms.length);
-                //console.log(allRooms);
-                console.log(this.availablerooms);
-                /*this.set('availablerooms', [
-                    new Room('room 1', '1', [new User("Sandro")], [
-                        new Message('Sandro', 'text', 'abc','8:56'),
-                        new Message('Dragan', 'text', 'cde','8:57')
-                    ], 'S'),
-                    new Room('room 2', '2', [], [
-                        new Message('sepi', 'text', 'abc','8:56'),
-                        new Message('pepi', 'text', 'cde','8:57')
-                    ], 'S')
-                ]);*/
-                this.set('availablerooms', []);
-                this.set('availablerooms', allRooms);
-                console.log(this.availablerooms);
-                //this.notifyPath('availablerooms', allRooms);
-                //this.message = 'ok';
-                //console.log(this.availablerooms);    
+                //this.set('room', undefined);
+                this.set('rooms', allRooms);
             }
             IOmessagesResponse(listOfMessages) {
                 console.log('messages received for ' + this.chatpartner + ' count: ' + listOfMessages.length);
@@ -110,6 +90,9 @@
                 this.push('allmessages', new MessageObj(message, this.username, this.chatpartner))
                 //this.allmessages.push();
                 console.log(this.allmessages)
+            }
+            IOreloadRooms(){
+                this.getAllrooms();
             }
             static get properties() {
                 return {
@@ -124,6 +107,10 @@
                     },
                     availablerooms: {
                         type: Array
+                    },
+                    rooms: {
+                        type: Array,
+                        notify: true
                     },
                     user: {
                         type: Object
